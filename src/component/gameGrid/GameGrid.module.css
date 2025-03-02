@@ -1,22 +1,45 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  width: 16rem;
+  height: 16rem;
+  margin: 1rem;
 }
 .box {
   width: 5rem;
   height: 5rem;
   border: 1px solid black;
-  cursor: pointer;
-  transition: background-color 0.5s ease;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: aliceblue;
+  color: black;
+  font-weight: 900;
+  font-size: larger;
+  transition: background-color 0.5s ease;
 }
-.box:hover {
-  background-color: rgba(0, 0, 0, 0.356);
+.box[data-onHover="true"]:hover {
+  background-color: rgba(127, 137, 141, 0.897);
+  cursor: pointer;
+}
+
+.playerWinner {
+  background-color: rgba(45, 116, 45, 0.829);
 }
 
 .container {
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+.text {
+  display: flex;
+  align-self: baseline;
+  padding: 4px;
+  color: aliceblue;
+  align-items: center;
+}
+.seqItem {
+  display: flex;
+  padding: 8px 8px;
 }

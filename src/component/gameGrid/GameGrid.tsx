@@ -2,25 +2,27 @@ import { useState } from "react";
 import styles from "./GameGrid.module.css";
 
 const matrix = [
-  { id: 0 },
-  { id: 1 },
-  { id: 2 },
-  { id: 3 },
-  { id: 4 },
-  { id: 5 },
-  { id: 6 },
-  { id: 7 },
-  { id: 8 },
+  { id: 0, player: "" },
+  { id: 1, player: "" },
+  { id: 2, player: "" },
+  { id: 3, player: "" },
+  { id: 4, player: "" },
+  { id: 5, player: "" },
+  { id: 6, player: "" },
+  { id: 7, player: "" },
+  { id: 8, player: "" },
 ];
 
 const Box = ({
   boxInfo,
   activePlayer,
   afterSelect,
+  winner,
 }: {
   boxInfo: any;
   activePlayer: string;
   afterSelect: Function;
+  winner: string;
 }) => {
   const { id, player = "" } = boxInfo;
   const onSelect = () => {
@@ -29,14 +31,19 @@ const Box = ({
   };
 
   return (
-    <div className={styles.box} onClick={onSelect}>
+    <div
+      className={`${styles.box} ${
+        winner !== "" && winner === player && styles.playerWinner
+      }`}
+      onClick={onSelect}
+      data-onHover={winner === ""}
+    >
       {player}
     </div>
   );
 };
 
 function checkWinner(board: any): string {
-  // Check rows, columns, and diagonals
   const winningCombinations = [
     [0, 1, 2], // Row 1
     [3, 4, 5], // Row 2
@@ -54,11 +61,11 @@ function checkWinner(board: any): string {
       board[a].player === board[b].player &&
       board[b].player === board[c].player
     ) {
-      return board[a].player; // Return the winner (1 or 2)
+      return board[a].player;
     }
   }
 
-  return ""; // No winner
+  return "";
 }
 
 function GameGrid() {
@@ -68,6 +75,8 @@ function GameGrid() {
   const [winner, setWinner] = useState("");
 
   const afterSelect = (id: number) => {
+    if (grid[id].player !== "") return;
+
     setQueue((prev: number[]) => {
       const updatedQueue = prev.length >= 7 ? prev.slice(1) : prev;
       return [...updatedQueue, id];
@@ -90,12 +99,27 @@ function GameGrid() {
 
     setActivePlayer((prev: string) => (prev === "X" ? "O" : "X"));
   };
+  const onReset = () => {
+    setGrid(matrix);
+    setActivePlayer("X");
+    setQueue([]);
+    setWinner("");
+  };
 
-  // console.log("#####grid", grid);
+  const getCoordinate = (x: number) => {
+    const col: number = Math.floor(x % 3) + 1;
+    const row: number = Math.floor(x / 3) + 1;
+    return (
+      <div>
+        {row}-{col}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.container}>
-      {/* <div>{queue.map((child) => child)}</div> */}
-      <div>{winner}</div>
+      <div className={styles.text}>Winner : {winner}</div>
+      <div className={styles.text}>Turn : {activePlayer}</div>
       <div className={styles.grid}>
         {grid.map((box) => {
           return (
@@ -104,10 +128,22 @@ function GameGrid() {
               boxInfo={box}
               activePlayer={activePlayer}
               afterSelect={afterSelect}
+              winner={winner}
             />
           );
         })}
       </div>
+      <div className={styles.text}>
+        Queue(row-col):
+        {queue.map((child) => {
+          return (
+            <div className={styles.seqItem}>
+              {getCoordinate(child)}({grid[child].player})
+            </div>
+          );
+        })}
+      </div>
+      {winner !== "" && <button onClick={onReset}>Reset</button>}
     </div>
   );
 }
