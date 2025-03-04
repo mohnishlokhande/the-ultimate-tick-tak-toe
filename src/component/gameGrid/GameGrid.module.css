@@ -44,8 +44,12 @@
   padding: 4px;
   color: aliceblue;
   align-items: center;
+  flex-wrap: wrap;
 }
 .seqItem {
   display: flex;
-  padding: 8px 8px;
+  padding: 4px 14px;
+  background-color: #858381b8;
+  border-radius: 16px;
+  margin: 0 4px 4px 0;
 }
