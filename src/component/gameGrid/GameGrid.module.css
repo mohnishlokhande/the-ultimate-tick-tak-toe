@@ -5,6 +5,9 @@
   height: 16rem;
   margin: 1rem;
 }
+.grid[data-haswinner="true"]:hover {
+  cursor: not-allowed;
+}
 .box {
   width: 5rem;
   height: 5rem;
@@ -18,9 +21,12 @@
   font-size: larger;
   transition: background-color 0.5s ease;
 }
-.box[data-onHover="true"]:hover {
+.box[data-haswinner="false"]:hover {
   background-color: rgba(127, 137, 141, 0.897);
   cursor: pointer;
+}
+.box[data-haswinner="true"]:hover {
+  background-color: rgba(117, 152, 161, 0.966);
 }
 
 .playerWinner {

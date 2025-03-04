@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./GameGrid.module.css";
 
 const matrix = [
@@ -15,18 +15,15 @@ const matrix = [
 
 const Box = ({
   boxInfo,
-  activePlayer,
   afterSelect,
   winner,
 }: {
   boxInfo: any;
-  activePlayer: string;
   afterSelect: Function;
   winner: string;
 }) => {
   const { id, player = "" } = boxInfo;
   const onSelect = () => {
-    console.log("####Select", boxInfo, activePlayer);
     afterSelect(id);
   };
 
@@ -36,7 +33,7 @@ const Box = ({
         winner !== "" && winner === player && styles.playerWinner
       }`}
       onClick={onSelect}
-      data-onHover={winner === ""}
+      data-haswinner={winner !== ""}
     >
       {player}
     </div>
@@ -73,9 +70,12 @@ function GameGrid() {
   const [activePlayer, setActivePlayer] = useState("X");
   const [queue, setQueue] = useState<number[]>([]);
   const [winner, setWinner] = useState("");
+  const [nxtStart, setNxtStart] = useState(false);
+  const [xWins, setXWins] = useState(0);
+  const [oWins, setOWins] = useState(0);
 
   const afterSelect = (id: number) => {
-    if (grid[id].player !== "") return;
+    if (grid[id].player !== "" || winner !== "") return;
 
     setQueue((prev: number[]) => {
       const updatedQueue = prev.length >= 7 ? prev.slice(1) : prev;
@@ -93,17 +93,22 @@ function GameGrid() {
           player: "",
         };
       }
-      setWinner(checkWinner(newGrid));
+      let gameWinner = checkWinner(newGrid);
+      setWinner(gameWinner);
+
       return newGrid;
     });
-
-    setActivePlayer((prev: string) => (prev === "X" ? "O" : "X"));
+    setActivePlayer((prev: string) => {
+      return prev === "X" ? "O" : "X";
+    });
   };
+
   const onReset = () => {
     setGrid(matrix);
-    setActivePlayer("X");
+    setActivePlayer(nxtStart ? "X" : "O");
     setQueue([]);
     setWinner("");
+    setNxtStart(!nxtStart);
   };
 
   const getCoordinate = (x: number) => {
@@ -116,17 +121,30 @@ function GameGrid() {
     );
   };
 
+  useEffect(() => {
+    if (winner !== "") {
+      console.log("###asda", winner);
+      if (winner === "X") setXWins((s) => s + 1);
+      else if (winner === "O") setOWins((s) => s + 1);
+    }
+  }, [winner]);
+
   return (
     <div className={styles.container}>
+      <div className={styles.text}>
+        X-O:&nbsp;&nbsp;{" "}
+        <b style={{ color: "green", fontSize: "xxx-large" }}>{xWins}</b>
+        <b style={{ fontSize: "xxx-large" }}>-</b>
+        <b style={{ color: "burlywood", fontSize: "xxx-large" }}>{oWins}</b>
+      </div>
       <div className={styles.text}>Winner : {winner}</div>
       <div className={styles.text}>Turn : {activePlayer}</div>
-      <div className={styles.grid}>
+      <div className={styles.grid} data-haswinner={winner !== ""}>
         {grid.map((box) => {
           return (
             <Box
               key={box.id}
               boxInfo={box}
-              activePlayer={activePlayer}
               afterSelect={afterSelect}
               winner={winner}
             />
@@ -143,7 +161,7 @@ function GameGrid() {
           );
         })}
       </div>
-      {winner !== "" && <button onClick={onReset}>Reset</button>}
+      {winner !== "" && <button onClick={onReset}>New Game</button>}
     </div>
   );
 }
